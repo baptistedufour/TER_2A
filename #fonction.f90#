@@ -1,0 +1,44 @@
+MODULE fonction
+
+  use prec
+
+  implicit none
+
+contains
+ function get_lambda(xi,yi) result(lambda)
+
+    real(pr):: E,nu
+    real(pr), intent(in)::xi, yi
+    real(pr)::lambda
+
+    !pour un lambda constant
+    E=62000._pr
+    nu=0.5_pr
+
+    lambda=1
+    !lambda=E*nu/((1+nu)*(1-2*nu))
+
+    !Si on veut avoir un lmabda qui change selon x on peut faire une fonction ici
+
+  end function get_lambda
+
+
+
+  function get_mu(xi,yi) result(mu)
+
+    real(pr):: E,nu
+    real(pr), intent(in)::xi, yi
+    real(pr)::mu
+
+    !pour un lambda constant
+    E=62000._pr
+    nu=0.5_pr
+
+    !mu=E/(2*(1+nu))
+    mu=1
+    !Si on veut avoir un mu qui change selon x on peut faire une fonction ici
+
+  end function get_mu
+
+  
+END MODULE fonction

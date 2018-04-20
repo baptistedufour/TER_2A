@@ -1,0 +1,42 @@
+#+OPTIONS: ^:nil
+
+* Files in this project
+- README.{org,md} :: this file.
+- Doxyfile :: config file to build the automatic documentation.
+- Makefile :: main Makefile for compilation.
+- Makefile.inc :: macro common to all makefils: name and options of the compiler.
+- doc :: directory for the Doxygen documentation. Directory create by doxygen.
+- meshes :: exemple meshes in various format
+- list.f90 :: linked list, for integers and real numbers only.
+- mat_csc.f90 :: matrices in the Compressed Sparse Column storage scheme.
+- mat_csr.f90 :: matrices in the Compressed Sparse Row storage scheme.
+- mat_list.f90 :: matrices as arrays of lists. Each list in the array represent
+     a row.
+- matrices.f90 :: include file to use for all matrix operations.
+- prec.f90 :: declare the precision of numbers.
+- sort.f90 :: methods for sorting arrays of integers or reals.
+- umfpack_calls.f90 :: module used to call the routines from the UMFPACK
+     library.
+- fe_mesh.f90 :: defines a mesh structure and methods on it, notably i/o and
+     useful accessors to members.
+- p1.f90 :: assemble the mass and stiffness martrices with P1-Lagrange finite
+     elements.
+- vtkCellType.inc :: include file from the VTK library, used to write vtk files
+     in fe_mesh.f90
+* Program files
+- data.txt :: entry file that contains data for the laplace program
+- laplace.f90 :: program that solves the PDE alpha*u-Delta(u) = f with
+     homogeneous boundary conditions
+- test_csc.f90 :: program used to test the CSC matrix format and resolution of
+     linear system with UMFPACK.
+* Compilation/installation
+** Prerequisite
+- A fortran compiler
+- The gnu make utility
+- The UMFPACK library, which is part of the SuiteSparse package. You can find it
+  on T. Davis web page: [[http://faculty.cse.tamu.edu/davis/suitesparse.html][http://faculty.cse.tamu.edu/davis/suitesparse.html]]
+** Compilation
+To compile, simply run 'make'. 
+
+You can run 'make clean' to delete the local object files. The compiled exec files
+and will remain. Type 'make distclean' to remove everything.
