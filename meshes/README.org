@@ -1,0 +1,9 @@
+#+TITLE exemple mesh files. Currently only in 2D
+
+* Description
+Simple meshes of the square (0,1)x(0,1) meshes with triangle ().
+
+* List of files
+- carre_1x1.48.{ele,node} :: mesh file with 48 nodes
+- carre_1x1.3979.{node,ele,mesh,vtk} :: mesh file wih 3979 nodes in 3 formats,
+     ele+node, mesh (from medit and mmg), and vtk (legacy).
