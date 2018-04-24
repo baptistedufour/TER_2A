@@ -1,5 +1,7 @@
-"meshes/carre_1x1.5.node"	!!$ fichier de maillage
-1.0				!!$ alpha
-3				!!$ choix_rhs (1:f=1, 2: f=1 dans disque, 3: f harmonique)
-1.				!!$ x_0,r_0 (cas 2) ou k (cas 3)
-test
+"meshes/carre_1x1.3979.node"	!!$ fichier de maillage
+1.0		 !!$ alpha
+3			 !!$ choix_rhs (1:f=1, 2: f=1 dans disque, 3: f harmonique)
+1.		 !!$ x_0,r_0 (cas 2) ou k (cas 3)
+1      !!direction de la traction
+0.     !!xymin  (éprouvette:ymin=-145)
+1.     !!xymax  (éprouvette:ymax=35)

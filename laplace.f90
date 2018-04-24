@@ -26,9 +26,9 @@ program laplace_prof
 
   ! Données du problème, qui sont lues dans le fichier d'entrées
   character(len=256) :: mesh_file
-  real(pr) :: alpha, k, r_0
+  real(pr) :: alpha, k, r_0,xymin,xymax
   real(pr), dimension(:), allocatable :: x_0
-  integer :: choix_rhs
+  integer :: choix_rhs,dir_trac
 
   ! Variables globales
   type(mesh) :: m ! Maillage
@@ -159,13 +159,16 @@ contains
     read (10,*) choix_rhs
     select case(choix_rhs)
     case(1)
-       ! Rien
+       read(10,*)
     case(2) ! on a besoin de x_0 et r_0
        allocate(x_0(2)) ! seulement en dimension 2 pour l'instant
        read(10,*) x_0(:), r_0
     case(3) ! on a besoin de k
        read(10,*) k
     end select
+    read(10,*) dir_trac
+    read(10,*) xymin
+    read(10,*) xymax
 
     close(10)
 

@@ -16,12 +16,12 @@ program laplace
 
   ! Donn�es du probl�me, qui sont lues dans le fichier d'entr�es
   character(len=256) :: mesh_file
-  real(pr) :: alpha, k, r_0
+  real(pr) :: alpha, k, r_0, xymin,xymax
   real(pr), dimension(:), allocatable :: x_0
-  integer :: choix_rhs
+  integer :: choix_rhs, dir_trac
 
   ! Variables globales
-  type(mesh) :: m ! Maillage
+  type(mesh) :: m, m2 ! Maillage
   type(m_list) :: K_l, M_l ! Matrices au format de listes
   type(csr) :: M_csr ! Matrice au format CSR
   type(csc) :: K_csc ! Matrice au format CSC
@@ -36,6 +36,7 @@ program laplace
   ! Lecture du maillage dans le fichier mesh_file
   call cpu_time(cpu_t1)
   call read_mesh(m, mesh_file)
+  call chg_lbl(m,xymin,xymax,dir_trac)
   call cpu_time(cpu_t2)
   print "(4X,'cpu time for reading the mesh: ',F6.4,' s')", cpu_t2-cpu_t1
   n_nodes = get_n_nodes(m)
@@ -87,6 +88,11 @@ program laplace
   ! Write the solution vector X to a vtk file
   call write_mesh(m,mesh_file(1:i)//'solution.vtk',X)
 
+  !Afficher le maillage déformé
+  m2=m
+  call strain(m2,X)
+  call write_mesh(m2,mesh_file(1:i)//'deplacement.vtk')
+
   ! ... to be completed, adapted...
 
   ! On lib�re la m�moire
@@ -107,7 +113,7 @@ contains
     integer, dimension(:), allocatable :: nodes
     real(pr), dimension(:,:), allocatable :: x
 
-    valeur_force = 200_pr
+    valeur_force = 20000000000_pr
     dim = get_dim(m)
     allocate( nodes(dim+1), x(dim,dim+1) )
     n_nodes = get_n_nodes(m)
@@ -181,13 +187,16 @@ contains
     read (10,*) choix_rhs
     select case(choix_rhs)
     case(1)
-       ! Rien
+       read(10,*)
     case(2) ! on a besoin de x_0 et r_0
        allocate(x_0(2)) ! seulement en dimension 2 pour l'instant
        read(10,*) x_0(:), r_0
     case(3) ! on a besoin de k
        read(10,*) k
     end select
+    read(10,*) dir_trac
+    read(10,*) xymin
+    read(10,*) xymax
 
     close(10)
 

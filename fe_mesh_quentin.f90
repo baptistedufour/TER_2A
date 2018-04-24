@@ -74,6 +74,7 @@ module fe_mesh_quentin
   public :: deallocate, read_mesh, write_mesh, my_print
   public :: get_n_subdomains, get_dim, get_n_elts, get_n_nodes, get_distance
   public :: get_measure, get_nodes, get_elt_code, get_node_code, get_x
+  public :: chg_lbl, strain
 
 contains
 
@@ -395,13 +396,7 @@ contains
        ! On essaie de lire un code de noeud.
        read (unit,*) m%node(1:m%dim,i), zero, m%node_code(i)
 
-       ! Si l'élément est sur le bord inférieur code=0, bord supérieur code=2 sinon code=1
-       if (abs(m%node(2,i)+145)<=0.001)  then !bord inférieur: y=-145
-          m%node_code(i)=0
-       else if (abs(m%node(2,i)-35)<=0.001) then!bord supérieur y=35
-          m%node_code(i)=2
-       end if
-      ! print*,m%node_code(i)
+
     end do
 
     ! read simplices : <element>, indices des noeuds et numero de sous
@@ -442,6 +437,23 @@ contains
 
   end subroutine read_mesh_mesh
 
+  subroutine chg_lbl(m,xymin,xymax,dir)
+    type(mesh),intent(inout)::m
+    real(pr),intent(in)::xymin,xymax
+    integer,intent(in)::dir
+    integer::i
+
+    do i=1,m%n_nodes
+      ! Si l'élément est sur le bord inférieur code=1, bord supérieur code=3 sinon code=0
+      if (abs(m%node(dir,i)-xymin)<=0.000001)  then !bord inférieur: y=-145
+        m%node_code(i)=1
+      else if (abs(m%node(dir,i)-xymax)<=0.000001) then!bord supérieur y=35
+        m%node_code(i)=3
+      else
+        m%node_code(i)=0
+      end if
+    end do
+  end subroutine
 
 
   !> @brief Free the memory.
@@ -589,9 +601,17 @@ contains
 
     ! 6/ Dataset if provided
     if (present(u)) then
-       write (unit,'(A,1X,A,1X,A,I2)') 'SCALARS','u','float', 1
+       write (unit,'(A,1X,A,1X,A,I2)') 'SCALARS','ux','float', 1
        write (unit,'(A,1X,A)') 'LOOKUP_TABLE','DEFAULT'
        write (unit,'(1E13.6)') (u(j), j=1,m%n_nodes)
+
+       if(size(u)==2*m%n_nodes) then
+         write (unit,'(A,1X,A,1X,A,I2)') 'SCALARS','uy','float', 1
+         write (unit,'(A,1X,A)') 'LOOKUP_TABLE','DEFAULT'
+         write (unit,'(1E13.6)') (u(j), j=m%n_nodes+1,2*m%n_nodes)
+      end if
+
+
     end if
 
     close(unit)
@@ -610,5 +630,16 @@ contains
     vec_product(3) = u(1)*v(2) - u(2)*v(1)
 
   end function vec_product
+
+  subroutine strain(m,u)
+    type(mesh),intent(inout)::m
+    real(pr),dimension(:),intent(in)::u
+    integer::i
+
+    do i=1,m%n_nodes
+      m%node(1,i)=m%node(1,i)+u(i)
+      m%node(2,i)=m%node(2,i)+u(m%n_nodes+i)
+    end do
+  end subroutine
 
 end module fe_mesh_quentin
