@@ -2,3 +2,4 @@
 1.0				!!$ alpha
 3				!!$ choix_rhs (1:f=1, 2: f=1 dans disque, 3: f harmonique)
 1.				!!$ x_0,r_0 (cas 2) ou k (cas 3)
+test
