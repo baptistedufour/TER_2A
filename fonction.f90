@@ -12,7 +12,7 @@ contains
     real(pr)::lambda
 
     !pour un lambda constant
-    E=62000000000._pr
+    E=210000._pr
     nu=0.3_pr
 
     lambda=(E*nu)/((1_pr+nu)*(1_pr - 2*nu))
@@ -30,7 +30,7 @@ contains
     real(pr)::mu
 
     !pour un lambda constant
-    E=62000000000._pr
+    E=210000._pr
     nu=0.3_pr
     !mu=1
     mu=E/(2_pr*(1_pr+nu))

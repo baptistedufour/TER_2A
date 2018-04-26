@@ -16,7 +16,7 @@ program laplace
 
   ! Donn�es du probl�me, qui sont lues dans le fichier d'entr�es
   character(len=256) :: mesh_file
-  real(pr) :: alpha, k, r_0, xymin,xymax
+  real(pr) :: alpha, k, r_0, xymin,xymax, valeur_force
   real(pr), dimension(:), allocatable :: x_0
   integer :: choix_rhs, dir_trac
 
@@ -60,7 +60,7 @@ program laplace
 
   ! Assemblage du second membre
   allocate(F(2*n_nodes))
-  call compute_rhs_function(F)
+  call compute_rhs_function(F, dir_trac, valeur_force)
   ! Second membre du syst�me lin�aire
   call deallocate(M_csr) ! La matrice CSR ne sert qu'au produit matrice-vecteur
   call cpu_time(cpu_t1)
@@ -106,19 +106,77 @@ program laplace
 contains
 
   ! Assemblage du second membre (partie sup�rieure et inferieur )
-  subroutine compute_rhs_function(F)
+  subroutine compute_rhs_function(F,dir_trac, valeur_force)
     real(pr), dimension(:), intent(inout) :: F
-    real(pr) :: valeur_force,h
+    real(pr), intent(in) :: valeur_force
+    real(pr) :: h
     integer :: i,dim,n_nodes,k
+    integer, intent(in) :: dir_trac
+    integer:: dir_trac_perp !direction perpendiculaire à la direction de traciotn pour les arrêtes
     integer, dimension(:), allocatable :: nodes
     real(pr), dimension(:,:), allocatable :: x
 
-    valeur_force = 20000000000_pr
+
+    dir_trac_perp= dir_trac+(-1)**(dir_trac+1)
     dim = get_dim(m)
     allocate( nodes(dim+1), x(dim,dim+1) )
     n_nodes = get_n_nodes(m)
 
     F=0_pr
+
+    !Cas où la force est selon x
+    if (dir_trac==1) then
+
+      !parcourt tous les elements
+      do i = 1, get_n_elts(m)
+         !prend les noeux du triangle k
+         nodes(:) = get_nodes(m,i)
+
+         !prend les cordonn�e des point du triangle i
+         do k = 1,dim+1
+            x(:,k) = get_x(m,nodes(k))
+         end do
+
+         !test si une arrete du triangle k est sur le bord
+         if (((get_node_code(m,nodes(1))==3) .AND. (get_node_code(m,nodes(2))==3)) .OR. &
+         ((get_node_code(m,nodes(2))==3) .AND. (get_node_code(m,nodes(3))==3)) &
+          .OR. ((get_node_code(m,nodes(1))==3) .AND. (get_node_code(m,nodes(3))==3))) then
+
+          !si le premier point n'est pas sur le bord
+          if (get_node_code(m,nodes(1))==0)then
+             h=abs(x(dir_trac_perp,2)-x(dir_trac_perp,3))
+             print*, x(2,2), x(2,3)
+             F(nodes(2))= h*valeur_force
+             !F(nodes(2)+n_nodes) = h*valeur_force
+             F(nodes(3))= h*valeur_force
+             !F(nodes(3)+n_nodes) = h*valeur_force
+          end if
+          ! le deuxieme point n'est pas sur le bord
+          if (get_node_code(m,nodes(2))==0)then
+             h=abs(x(dir_trac_perp,1)-x(dir_trac_perp,3))
+             F(nodes(3))= h*valeur_force
+             !F(nodes(3)+n_nodes) = h*valeur_force
+             F(nodes(1))= h*valeur_force
+             !F(nodes(1)+n_nodes) = h*valeur_force
+          end if
+          !le troisieme point n'est pas sur le bord
+          if (get_node_code(m,nodes(3))==0)then
+
+             h=abs(x(dir_trac_perp,2)-x(dir_trac_perp,1))
+             F(nodes(1))= h*valeur_force
+             !F(nodes(1)+n_nodes) = h*valeur_force
+             F(nodes(2))= h*valeur_force
+             !F(nodes(2)+n_nodes) = h*valeur_force
+          end if
+
+       end if
+
+    end do
+
+
+    !Cas ou la force est selon y
+    elseif (dir_trac==2) then
+
     !parcourt tous les elements
     do i = 1, get_n_elts(m)
        !prend les noeux du triangle k
@@ -136,40 +194,37 @@ contains
 
         !si le premier point n'est pas sur le bord
         if (get_node_code(m,nodes(1))==0)then
-           h=abs(x(2,2)-x(2,3))
-           F(nodes(2))= h*valeur_force
-           !F(nodes(2)+n_nodes) = h*valeur_force
-           F(nodes(3))= h*valeur_force
-           !F(nodes(3)+n_nodes) = h*valeur_force
-
+           h=abs(x(dir_trac_perp,2)-x(dir_trac_perp,3))
+           print*, x(2,2), x(2,3)
+           !F(nodes(2))= h*valeur_force
+           F(nodes(2)+n_nodes) = h*valeur_force
+           print*, h,  valeur_force, nodes(2)+n_nodes
+           !F(nodes(3))= h*valeur_force
+           F(nodes(3)+n_nodes) = h*valeur_force
         end if
         ! le deuxieme point n'est pas sur le bord
         if (get_node_code(m,nodes(2))==0)then
-           h=abs(x(2,1)-x(2,3))
-           F(nodes(3))= h*valeur_force
-           !F(nodes(3)+n_nodes) = h*valeur_force
-           F(nodes(1))= h*valeur_force
-           !F(nodes(1)+n_nodes) = h*valeur_force
-
+           h=abs(x(dir_trac_perp,1)-x(dir_trac_perp,3))
+           !F(nodes(3))= h*valeur_force
+           F(nodes(3)+n_nodes) = h*valeur_force
+           !F(nodes(1))= h*valeur_force
+           F(nodes(1)+n_nodes) = h*valeur_force
         end if
         !le troisieme point n'est pas sur le bord
         if (get_node_code(m,nodes(3))==0)then
 
-           h=abs(x(2,2)-x(2,1))
-           F(nodes(1))= h*valeur_force
-           !F(nodes(1)+n_nodes) = h*valeur_force
-           F(nodes(2))= h*valeur_force
-           !F(nodes(2)+n_nodes) = h*valeur_force
+           h=abs(x(dir_trac_perp,2)-x(dir_trac_perp,1))
+           !F(nodes(1))= h*valeur_force
+           F(nodes(1)+n_nodes) = h*valeur_force
+           !F(nodes(2))= h*valeur_force
+           F(nodes(2)+n_nodes) = h*valeur_force
         end if
 
      end if
 
-
-
   end do
 
-    print*, "Montre moi la force" , F
-
+end if
 
   end subroutine compute_rhs_function
 
@@ -197,6 +252,7 @@ contains
     read(10,*) dir_trac
     read(10,*) xymin
     read(10,*) xymax
+    read(10,*) valeur_force
 
     close(10)
 
