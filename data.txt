@@ -1,8 +1,8 @@
-"meshes/epTER.mesh"	!!$ fichier de maillage
+"meshes/mesh_precis.mesh"	!!$ fichier de maillage
 1.0		 !!$ alpha
 3			 !!$ choix_rhs (1:f=1, 2: f=1 dans disque, 3: f harmonique)
 1.		 !!$ x_0,r_0 (cas 2) ou k (cas 3)
 2      !!direction de la traction
--145.   !!x/ymin  (éprouvette:ymin=-145.) (carré:xmin=0.)
-35.     !!x/ymax  (éprouvette:ymax=35.) (carré:xmax=1.)
-2000.   !!valeur de la Force (en Newton dans notre cas)
+-150.  !!x/ymin  (éprouvette:ymin=-145.) (carré:xmin=0.)
+30.     !!x/ymax  (éprouvette:ymax=35.) (carré:xmax=1.)
+100.   !!valeur de la Contrainte (en Newton dans notre cas)

@@ -91,7 +91,7 @@ program laplace
   !Afficher le maillage déformé
   m2=m
   call strain(m2,X)
-  call write_mesh(m2,mesh_file(1:i)//'deplacement.vtk')
+  call write_mesh(m2,mesh_file(1:i)//'deplacement.vtk',x)
 
   ! ... to be completed, adapted...
 
@@ -99,7 +99,6 @@ program laplace
   call deallocate(K_csc)
   call deallocate(m)
 
-  print*, "X", X
   deallocate(F,X)
   if (allocated(x_0)) deallocate(x_0)
 
@@ -145,7 +144,6 @@ contains
           !si le premier point n'est pas sur le bord
           if (get_node_code(m,nodes(1))==0)then
              h=abs(x(dir_trac_perp,2)-x(dir_trac_perp,3))
-             print*, x(2,2), x(2,3)
              F(nodes(2))= h*valeur_force
              !F(nodes(2)+n_nodes) = h*valeur_force
              F(nodes(3))= h*valeur_force
@@ -195,10 +193,8 @@ contains
         !si le premier point n'est pas sur le bord
         if (get_node_code(m,nodes(1))==0)then
            h=abs(x(dir_trac_perp,2)-x(dir_trac_perp,3))
-           print*, x(2,2), x(2,3)
            !F(nodes(2))= h*valeur_force
            F(nodes(2)+n_nodes) = h*valeur_force
-           print*, h,  valeur_force, nodes(2)+n_nodes
            !F(nodes(3))= h*valeur_force
            F(nodes(3)+n_nodes) = h*valeur_force
         end if

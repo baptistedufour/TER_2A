@@ -142,7 +142,7 @@ contains
           do j = 1,dim+1
 
 !!$             ! K^{11_lambda}_KJ= lambda*d_1phi_J*d_1phi_I*|T|
-            print*, "triangle = ", i, "gradient =", gradient (1,j), gradient(1,k), gradient(2,j), gradient(2,k)
+            !print*, "triangle = ", i, "gradient =", gradient (1,j), gradient(1,k), gradient(2,j), gradient(2,k)
              K_11_kj = gradient(1,j)*gradient(1,k)*measure
              K_12_kj = gradient(1,k)*gradient(2,j)*measure
              K_22_kj = gradient(2,j)*gradient(2,k)*measure
@@ -214,12 +214,10 @@ contains
     n_nodes = get_n_nodes(m)
     n_elts = get_n_elts(m)
     allocate( nodes(dim+1))
-    print*, "nombre d'elements = ", n_elts
     do i = 1,n_elts
         ! On recupere les sommets
        nodes(:) = get_nodes(m,i)
        do k = 1,dim+1
-         print*, "dimnesion +1", dim+1
           !print*, get_node_code(m,nodes(k)), nodes(k)
           if (get_node_code(m,nodes(k))==1) then !(m,node(k))
              do j=1,2*n_nodes
@@ -229,15 +227,10 @@ contains
                 call mat_add_value(stiffness,j,nodes(k)+n_nodes,0._pr,mat_set)
              end do
              call mat_add_value(stiffness, nodes(k)+n_nodes, nodes(k)+n_nodes,1._pr, mat_set)
-             print*,  nodes(k)+n_nodes, nodes(k)+n_nodes,1
              call mat_add_value(stiffness, nodes(k), nodes(k),1._pr, mat_set)
-             print*, nodes(k), nodes(k),1.
           end if
        end do
     end do
-
-
-    call print(stiffness)
 
     deallocate(nodes)
 
