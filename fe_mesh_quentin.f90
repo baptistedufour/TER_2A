@@ -357,7 +357,8 @@ contains
     character(len=*), intent(in) :: file_name
     type(mesh), intent(out)      :: m
 
-    integer :: unit, i,zero
+    integer :: unit, i
+    real(pr)::zero
     character(len=8) :: line
 
     unit = 10
@@ -393,6 +394,7 @@ contains
     allocate(m%node(m%dim, m%n_nodes))
     allocate(m%node_code(m%n_nodes))
     do i=1,m%n_nodes
+      print*,i
        ! On essaie de lire un code de noeud.
        read (unit,*) m%node(1:m%dim,i), zero, m%node_code(i)
 
